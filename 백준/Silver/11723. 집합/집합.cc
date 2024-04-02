@@ -1,7 +1,12 @@
 #include <iostream>
 #include <algorithm>
-#include <vector>
+#include <set>
+#define endl '\n'
+#define pii pair<int, int>
+using ll = long long;
 using namespace std;
+
+int arr[21] = {0};
 
 int main() {
     ios::sync_with_stdio(false);
@@ -9,54 +14,32 @@ int main() {
     cout.tie(NULL);
 
     int M;
-    string cmd;
-    int num;
-
-    vector<int> v;
-
     cin >> M;
-    
-    for (int i = 0; i < M; i++) {
-        cin >> cmd;
-        if (cmd == "add") {
+
+    while (M--) {
+        string op; int num;
+        cin >> op;
+
+        if (op == "add") {
             cin >> num;
-            if (!binary_search(v.begin(), v.end(), num)) {
-                v.push_back(num);
-            }
+            arr[num] = 1;
         }
-        if (cmd == "remove") {
+        else if (op == "remove") {
             cin >> num;
-            if (binary_search(v.begin(), v.end(), num)) {
-                v.erase(remove(v.begin(), v.end(), num), v.end());
-            }
+            arr[num] = 0;
         }
-        if (cmd == "check") {
+        else if (op == "check") {
             cin >> num;
-            if (binary_search(v.begin(), v.end(), num)) {
-                cout << 1 << '\n';
-            }
-            else {
-                cout << 0 << '\n';
-            }
+            if (arr[num]) cout << 1 << endl;
+            else cout << 0 << endl;
         }
-        if (cmd == "toggle") {
+        else if (op == "toggle") {
             cin >> num;
-            if (binary_search(v.begin(), v.end(), num)) {
-                v.erase(remove(v.begin(), v.end(), num), v.end());
-            }
-            else {
-                v.push_back(num);
-            }
+            arr[num] = !arr[num];
         }
-        if (cmd == "all") {
-            v.clear();
-            for (int i = 1; i <= 20; i++) {
-                v.push_back(i);
-            }
+        else if (op == "all") {
+            fill(&arr[1], &arr[21], 1);
         }
-        if (cmd == "empty") {
-            v.clear();
-        }
+        else if (op == "empty") fill(&arr[1], &arr[21], 0);
     }
-    sort(v.begin(), v.end());
 }
