@@ -6,28 +6,28 @@ int main() {
     cin.tie(NULL);
     cout.tie(NULL);
 
-    long double X, Y;
-    long Z;
+    long long X, Y, Z;
 
     cin >> X >> Y;
-    Z = (Y / X) * 100;
+    Z = (Y * 100) / X;
+
 
     if (Z >= 99) {
         cout << -1;
         return 0;
     }
 
-    long l = 0, r = X, res = 0;
+    long l = 0, r = 1e9, res = 0;
 
     while (l <= r) {
         long mid = (l + r) / 2;
-        long tempZ = ((Y + mid) / (X + mid)) * 100;
-        if (tempZ == Z) {
-            l = mid + 1;
-        }
-        else {
+        long tempZ = ((Y + mid)*100) / (X + mid);
+        if (tempZ > Z) {
             r = mid - 1;
             res = mid;
+        }
+        else {
+            l = mid + 1;
         }
     }
     cout << res;
