@@ -1,82 +1,57 @@
 #include <iostream>
 #include <algorithm>
 #include <vector>
+#include <bits/stdc++.h>
 #define endl '\n'
-#define pii pair<int, int>
+#define pll pair<ll, ll>
 using ll = long long;
 using namespace std;
 
-ll arr[100010], tree[400010]; // 초기 별 개수, i-1보다 i번째가 몇 개 더 많은가 (상대적 차이)
-ll lazy[400010];
+int n, q;
+ll arr[100010];
+ll tree[100010], cnt[100010];
 
-ll init(int index, int s, int e) {
-    if (s == e) return tree[index] = arr[s];
-    int mid = (s + e) / 2;
-    return tree[index] = init(index * 2, s, mid) + init(index * 2 + 1, mid + 1, e);
-}
-
-void propagate(int index, int s, int e) {
-    if (lazy[index]) {
-        if (s != e) {
-            lazy[index * 2] += lazy[index];
-            lazy[index * 2 + 1] += lazy[index];
-        }
-        tree[index] += (e - s + 1) * lazy[index];
-        lazy[index] = 0;
+void update(int a, int val) { // a에서 시작해서 모든 하위 노드 +val
+    for (int i = a; i <= n; i+= (i & -i)) {
+        tree[i] += val;
+        if (val > 0) cnt[i]++;
+        else cnt[i]--;
     }
 }
 
-void update(int index, int s, int e, int l, int r, int diff) {
-    propagate(index, s, e);
-
-    if (r < s || e < l) return; // 범위 밖
-    if (l <= s && e <= r) { // 완벽하게 범위 겹침
-        lazy[index] += diff;
-        propagate(index, s, e);
-        return;
+pll getsum(int a) {
+    pll res = {0, 0};
+    for (int i = a; i > 0; i -= (i & -i)) {
+        res.first += tree[i]; // b 값들의 합
+        res.second += cnt[i]; // 몇 번 업데이트 됐는지
     }
-
-    int mid = (s + e) / 2;
-    update(index * 2, s, mid, l, r, diff);
-    update(index * 2 + 1, mid + 1, e, l, r, diff);
-    tree[index] = tree[index * 2] + tree[index * 2 + 1];
+    return res;
 }
 
-ll getval(int index, int s, int e, int l, int r) {
-    propagate(index, s, e);
-
-    if (r < s || e < l) return 0;
-    if (l <= s && e <= r) return tree[index];
-
-    int mid = (s + e) / 2;
-    return getval(index * 2, s, mid, l, r) + getval(index * 2 + 1, mid + 1, e, l, r);
-}
 
 int main() {
     ios::sync_with_stdio(false);
     cin.tie(NULL);
     cout.tie(NULL);
 
-    int n, q;
     cin >> n;
-
     for (int i = 1; i <= n; i++) cin >> arr[i];
-    for (int i = 1; i <= n; i++) update(1, 1, n, i, i, arr[i] - arr[i - 1]);
 
     cin >> q;
     for (int i = 0; i < q; i++) {
         int a, b, c;
         cin >> a;
-
-        if (a == 1) { // b~c 별 내림 1~
+        
+        if (a == 1) { // b~c에 별 떨어짐 1~(c-b+1)
             cin >> b >> c;
-            update(1, 1, n, b, c, 1);
-            update(1, 1, n, c + 1, c + 1, -(c - b + 1));
-
+            update(b, b);
+            update(c + 1, -b);
         }
-        else { // b 별 개수 출력
+        else { // b에 떨어진 별 출력
             cin >> b;
-            cout << getval(1, 1, n, 1, b) << endl;
+            pll count = getsum(b);
+            cout << count.second * (b + 1) - count.first + arr[b] << endl;
+
         }
     }
 }
